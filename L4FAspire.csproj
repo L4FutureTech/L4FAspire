@@ -3,11 +3,30 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <PackageId>L4FutureTech.public.L4FAspire</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>L4FutureTech</Authors>
+        <Product>L4FAspire</Product>
+        <Company>L4FutureTech</Company>
+        <Description>Aspire Extensions from L4FutureTech applications.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/L4FutureTech/L4FAspire</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/L4FutureTech/L4FAspire</RepositoryUrl>
+        <Copyright>Copyright (c) L4Future.Tech</Copyright>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
       <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="README.md">
+            <Pack>true</Pack>
+            <PackagePath>\</PackagePath>
+        </Content>
     </ItemGroup>
 
 </Project>

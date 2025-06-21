@@ -1,0 +1,44 @@
+name: Publish Blazor RCL to NuGet
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2) Set up .NET SDK (using .NET 9.0)
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'      # installs the latest .NET 9 SDK
+
+      # 3) Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4) Build the project
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+      # 5) Pack the RCL as a NuGet package
+      - name: Pack RCL as NuGet package
+        run: |
+          dotnet pack ./L4FutureTechBlazor.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./nupkg
+
+      # 6) Push the package to NuGet.org
+      - name: Push package to NuGet.org
+        run: |
+          dotnet nuget push ./nupkg/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json
