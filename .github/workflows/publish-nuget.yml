@@ -31,7 +31,7 @@ jobs:
       # 5) Pack the RCL as a NuGet package
       - name: Pack RCL as NuGet package
         run: |
-          dotnet pack ./L4FutureTechBlazor.csproj \
+          dotnet pack ./L4FAspire.csproj \
             --configuration Release \
             --no-build \
             --output ./nupkg
