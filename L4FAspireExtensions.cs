@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using Aspire.Hosting.ApplicationModel;
 
 namespace L4FAspire;
 
 public static class L4FAspireExtensions
 {
     // Reuse a singleton JsonSerializerOptions to avoid the CA1869 performance warning
-    private static readonly JsonSerializerOptions s_jsonOptions = new()
+    private static readonly JsonSerializerOptions SJsonOptions = new()
     {
         WriteIndented = true
     };
@@ -128,9 +127,9 @@ public static class L4FAspireExtensions
         bool isHttps = false)
     {
         // Determine the URL: either the custom one or resolved via service discovery
-        string url = customUrl
-            ?? builder.GetEndpoint(isHttps ? "https" : "http").Url
-            + (route?.StartsWith("/") == true ? route : $"/{route}");
+        var url = customUrl
+                  ?? builder.GetEndpoint(isHttps ? "https" : "http").Url
+                  + (route?.StartsWith('/') == true ? route : $"/{route}");
 
         ProcessStartInfo psi = new(url)
         {
@@ -151,12 +150,12 @@ public static class L4FAspireExtensions
         IResourceBuilder<ProjectResource> api)
         where TProject : IProjectMetadata, new()
     {
-        IResourceBuilder<ProjectResource> project = builder.AddProject<TProject>(name);
-        string projectPath = new TProject().ProjectPath;
-        string wwwroot = Path.Combine(Path.GetDirectoryName(projectPath)!, "wwwroot");
+        var project = builder.AddProject<TProject>(name);
+        var projectPath = new TProject().ProjectPath;
+        var wwwroot = Path.Combine(Path.GetDirectoryName(projectPath)!, "wwwroot");
         _ = Directory.CreateDirectory(wwwroot);
 
-        string settingsFile = Path.Combine(wwwroot, "appsettingsaspire.json");
+        var settingsFile = Path.Combine(wwwroot, "appsettingsaspire.json");
         if (!File.Exists(settingsFile))
         {
             File.WriteAllText(settingsFile, "{}");
@@ -164,18 +163,17 @@ public static class L4FAspireExtensions
 
         _ = project.WithEnvironment(ctx =>
         {
-            if (api.Resource.TryGetEndpoints(out IEnumerable<EndpointAnnotation>? endpoints) && endpoints.Any())
-            {
-                string uri = api.Resource.GetEndpoint("http").Url;
-                string json = File.ReadAllText(settingsFile);
-                Dictionary<string, object> dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json, s_jsonOptions)
-                           ?? [];
+            if (!api.Resource.TryGetEndpoints(out var endpoints) ||
+                !endpoints.Any()) return;
+            var uri = api.Resource.GetEndpoint("http").Url;
+            var json = File.ReadAllText(settingsFile);
+            var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json, SJsonOptions)
+                       ?? [];
 
-                dict["ApiUrlFromAspire"] = uri;
-                File.WriteAllText(settingsFile, JsonSerializer.Serialize(dict, s_jsonOptions));
+            dict["ApiUrlFromAspire"] = uri;
+            File.WriteAllText(settingsFile, JsonSerializer.Serialize(dict, SJsonOptions));
 
-                ctx.EnvironmentVariables["ApiUrlFromAspire"] = uri;
-            }
+            ctx.EnvironmentVariables["ApiUrlFromAspire"] = uri;
         });
 
         return project;
